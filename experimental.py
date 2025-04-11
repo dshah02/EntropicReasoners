@@ -259,6 +259,9 @@ def mi_reward(completions, prompts, answer, **kwargs):
 # Configure training
 max_prompt_length = 256
 
+# Save the trained model with unique ID
+run_id = random.randint(1000, 9999)
+
 training_args = GRPOConfig(
     learning_rate=5e-6,
     adam_beta1=0.9,
@@ -277,7 +280,7 @@ training_args = GRPOConfig(
     save_steps=250,
     max_grad_norm=0.1,
     report_to="none",
-    output_dir="outputs",
+    output_dir=f"outputs_{run_id}",
     # Add these parameters to ensure offline mode
     hub_model_id=None,  # Disable Hugging Face Hub integration
     push_to_hub=False,  # Don't try to push to Hub
@@ -307,8 +310,7 @@ trainer = GRPOTrainer(
 
 trainer.train()
 
-# Save the trained model with unique ID
-run_id = random.randint(1000, 9999)
+
 print(f"Saving trained model with ID {run_id}...")
-trainer.model.save_pretrained(f"./outputs/final_model_{run_id}")
+trainer.model.save_pretrained(f"./outputs/final_model")
 print("Training completed successfully!")
