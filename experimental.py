@@ -7,6 +7,7 @@ import json
 import os
 import logging
 import random
+import math
 
 # Set environment variables for offline mode
 os.environ["TRANSFORMERS_OFFLINE"] = "1"
@@ -184,10 +185,14 @@ def get_log_probability(prompt, completion):
     input_ids = torch.tensor([combined_tokens]).to(model.device)
     
     with torch.no_grad():
+        os_set = False
+        if "UNSLOTH_RETURN_HIDDEN_STATES" in os.environ:
+            os_set = True
+            del os.environ["UNSLOTH_RETURN_HIDDEN_STATES"] #internally unsloth sets this to 1 after the first GRPO step
         outputs = model(input_ids)
-        os.environ["UNSLOTH_RETURN_HIDDEN_STATES"] = "0" #internally unsloth changes this to 1 after the first GRPO step
         logits = outputs.logits
-        os.environ["UNSLOTH_RETURN_HIDDEN_STATES"] = "1"
+        if os_set:
+            os.environ["UNSLOTH_RETURN_HIDDEN_STATES"] = "1"
 
         # if logits.shape[-1] == 4096: #alternative way to get around this
         #     #Internally, UnslothGRPOTrainer.py runs os.environ["UNSLOTH_RETURN_HIDDEN_STATES"] = "1"
@@ -216,14 +221,17 @@ def mi_reward(completions, prompts, answer, **kwargs):
     for i in range(len(contents)): #need to parallelize this, i.e. stack before get probs
         idx = extract_strategy_idx(questions[i])
         log_p_z = get_log_probability(questions[i], contents[i])
-        log_p = 0.0
-
+        
+        log_values = []
         for z in Z:
             _, new_question = replace_strategy_idx(questions[i], z)
-            log_p += get_log_probability(new_question, contents[i])
-        log_p *= 1/len(Z)
+            log_val = get_log_probability(new_question, contents[i]) - math.log(len(Z))
+            log_values.append(log_val)
 
-        reward = alpha * (log_p - log_p_z) 
+        M = max(log_values) #to avoid underflow
+        log_p = M + math.log(sum(math.exp(lv - M) for lv in log_values))
+        
+        reward = alpha * (log_p_z - log_p) 
         rewards.append(reward)
 
     return rewards
