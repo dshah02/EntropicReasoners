@@ -8,22 +8,42 @@ import os
 import logging
 import random
 import math
+import yaml
+import argparse
+
+# Configure logging first
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+
+# Parse command line arguments
+parser = argparse.ArgumentParser(description='Run the experimental model with configuration')
+parser.add_argument('--config', type=str, default='config_1.yaml', help='Path to the configuration file')
+args = parser.parse_args()
 
 # Set environment variables for offline mode
 os.environ["TRANSFORMERS_OFFLINE"] = "1"
 os.environ["HF_HUB_OFFLINE"] = "1"
 os.environ["HF_DATASETS_OFFLINE"] = "1"
 
+# Load configuration from yaml file
+with open(args.config, 'r') as f:
+    config = yaml.safe_load(f)
 
-# Increase logging to debug issues
-logging.basicConfig(level=logging.INFO)
+# Log configuration values
+logging.info(f"Configuration loaded from {args.config}:")
+logging.info(f"max_seq_length: {config['max_seq_length']}")
+logging.info(f"lora_rank: {config['lora_rank']}")
+logging.info(f"alpha: {config['alpha']}")
+logging.info(f"max_z: {config['max_z']}")
 
-# Set caching and model parameters
+# Set caching and model parameters from config
 cache_dir = "./cache"  # Local cache directory
-max_seq_length = 1024
-lora_rank = 32
-alpha = 0.5
-Z = list(range(1,6))
+max_seq_length = config['max_seq_length']
+lora_rank = config['lora_rank']
+alpha = config['alpha']
+Z = list(range(1, config['max_z'] + 1))
 
 # Configure to skip VLLM for offline use
 # The key is to bypass VLLM's auto-detection which tries to access HF Hub
