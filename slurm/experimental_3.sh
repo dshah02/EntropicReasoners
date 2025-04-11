@@ -1,5 +1,5 @@
 #!/bin/sh
-#SBATCH --job-name=exp_2 # create a short name for your job
+#SBATCH --job-name=exp_3 # create a short name for your job
 #SBATCH --output=slurm/slurm_output/april10/exp/%x_%j.out
 #SBATCH --error=slurm/slurm_output/april10//exp/%x_%j.err
 #SBATCH --nodes=1                # node count
@@ -8,7 +8,7 @@
 #SBATCH --mem-per-cpu=64G                 # total memory per CPU core (4 GB per cpu-core is default)
 #SBATCH --gres=gpu:1
 #SBATCH --constraint=gpu80       # Use for enforcing GPUs with 80GB memory, without it will get either 40GB or 80GB
-#SBATCH --time=3:30:00          # total run time limit (HH:MM:SS)
+#SBATCH --time=1:30:00          # total run time limit (HH:MM:SS)
 #SBATCH --account=eladgroup
 #SBATCH --partition=pli
 #SBATCH --mail-type=BEGIN,END,FAIL          # send email on job start, end and on fail

@@ -1,5 +1,5 @@
 #!/bin/sh
-#SBATCH --job-name=exp_2 # create a short name for your job
+#SBATCH --job-name=exp_4 # create a short name for your job
 #SBATCH --output=slurm/slurm_output/april10/exp/%x_%j.out
 #SBATCH --error=slurm/slurm_output/april10//exp/%x_%j.err
 #SBATCH --nodes=1                # node count
@@ -41,4 +41,4 @@ fi
 echo "Running nvidia-smi to check GPU status:"
 nvidia-smi
 
-python experimental.py --config configs/config_2.yaml
+python experimental.py --config configs/config_4.yaml
