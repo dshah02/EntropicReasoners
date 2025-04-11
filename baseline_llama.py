@@ -164,3 +164,10 @@ trainer = GRPOTrainer(
     train_dataset = dataset,
 )
 trainer.train()
+
+import random
+# Save the trained model with unique ID
+run_id = random.randint(1000, 9999)
+print(f"Saving trained model with ID {run_id}...")
+trainer.model.save_pretrained(f"./outputs/final_model_{run_id}")
+print("Training completed successfully!")
