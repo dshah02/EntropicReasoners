@@ -312,5 +312,5 @@ trainer.train()
 
 
 print(f"Saving trained model with ID {run_id}...")
-trainer.model.save_pretrained(f"./outputs/final_model")
+trainer.model.save_pretrained(f"./outputs_{run_id}/final_model")
 print("Training completed successfully!")

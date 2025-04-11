@@ -1,0 +1,22 @@
+Traceback (most recent call last):
+  File "/home/ds6237/EntropicReasoners/baseline_offline.py", line 1, in <module>
+    from unsloth import FastLanguageModel
+  File "/home/ds6237/.conda/envs/grpo/lib/python3.10/site-packages/unsloth/__init__.py", line 219, in <module>
+    from .models import *
+  File "/home/ds6237/.conda/envs/grpo/lib/python3.10/site-packages/unsloth/models/__init__.py", line 15, in <module>
+    from .llama   import FastLlamaModel
+  File "/home/ds6237/.conda/envs/grpo/lib/python3.10/site-packages/unsloth/models/llama.py", line 37, in <module>
+    from ..kernels import *
+  File "/home/ds6237/.conda/envs/grpo/lib/python3.10/site-packages/unsloth/kernels/__init__.py", line 15, in <module>
+    from .cross_entropy_loss import (
+  File "/home/ds6237/.conda/envs/grpo/lib/python3.10/site-packages/unsloth/kernels/cross_entropy_loss.py", line 18, in <module>
+    from .utils import (
+  File "/home/ds6237/.conda/envs/grpo/lib/python3.10/site-packages/unsloth/kernels/utils.py", line 88, in <module>
+    _CUDA_STREAMS = {
+  File "/home/ds6237/.conda/envs/grpo/lib/python3.10/site-packages/unsloth/kernels/utils.py", line 89, in <dictcomp>
+    (index := torch.cuda.device(i).idx) : ctypes.c_void_p(torch._C._cuda_getCurrentRawStream(index))
+RuntimeError: CUDA error: CUDA-capable device(s) is/are busy or unavailable
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+
