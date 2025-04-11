@@ -41,4 +41,4 @@ fi
 echo "Running nvidia-smi to check GPU status:"
 nvidia-smi
 
-python experimental.py --config config_0.yaml
+python experimental.py --config configs/config_0.yaml
