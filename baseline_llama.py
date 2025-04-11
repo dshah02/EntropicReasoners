@@ -2,6 +2,7 @@
 from unsloth import FastLanguageModel
 import torch
 import re
+from trl import GRPOConfig, GRPOTrainer
 
 model_name = "meta-llama/meta-Llama-3.1-8B-Instruct"
 max_seq_length = 1024 # Can increase for longer reasoning traces
@@ -61,6 +62,7 @@ def extract_hash_answer(text: str) -> str | None:
         return None
     return text.split("####")[1].strip()
 
+
 # uncomment middle messages for 1-shot prompting
 def get_gsm8k_questions(split = "train") -> Dataset:
     data = load_dataset('openai/gsm8k', 'main')[split] # type: ignore
@@ -102,6 +104,7 @@ def soft_format_reward_func(completions, **kwargs) -> list[float]:
     matches = [re.match(pattern, r) for r in responses]
     return [0.5 if match else 0.0 for match in matches]
 
+
 def count_xml(text) -> float:
     count = 0.0
     if text.count("<reasoning>\n") == 1:
@@ -123,7 +126,7 @@ def xmlcount_reward_func(completions, **kwargs) -> list[float]:
 
 max_prompt_length = 256
 
-from trl import GRPOConfig, GRPOTrainer
+
 training_args = GRPOConfig(
     learning_rate = 5e-6,
     adam_beta1 = 0.9,

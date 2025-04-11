@@ -8,7 +8,7 @@
 #SBATCH --mem-per-cpu=64G                 # total memory per CPU core (4 GB per cpu-core is default)
 #SBATCH --gres=gpu:1
 #SBATCH --constraint=gpu80       # Use for enforcing GPUs with 80GB memory, without it will get either 40GB or 80GB
-#SBATCH --time=10:00:00          # total run time limit (HH:MM:SS)
+#SBATCH --time=3:30:00          # total run time limit (HH:MM:SS)
 #SBATCH --account=eladgroup
 #SBATCH --partition=pli
 #SBATCH --mail-type=BEGIN,END,FAIL          # send email on job start, end and on fail

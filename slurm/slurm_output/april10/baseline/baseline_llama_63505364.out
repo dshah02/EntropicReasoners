@@ -1,0 +1,29 @@
+[2025-04-10 19:57:02] Python version: Python 3.10.16
+PyTorch version: 2.6.0+cu124
+CUDA available: True
+CUDA version: 12.4
+[2025-04-10 19:57:07] GPU Information: NVIDIA H100 80GB HBM3
+Running nvidia-smi to check GPU status:
+Thu Apr 10 19:57:07 2025       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 570.124.06             Driver Version: 570.124.06     CUDA Version: 12.8     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100 80GB HBM3          On  |   00000000:5D:00.0 Off |                    0 |
+| N/A   45C    P0            135W /  700W |       1MiB /  81559MiB |      3%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+Unsloth: Failed to patch Gemma3ForConditionalGeneration.
+🦥 Unsloth Zoo will now patch everything to make training faster!

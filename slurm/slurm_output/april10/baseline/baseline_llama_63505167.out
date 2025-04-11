@@ -1,0 +1,44 @@
+[2025-04-10 19:36:38] Python version: Python 3.10.16
+PyTorch version: 2.6.0+cu124
+CUDA available: True
+CUDA version: 12.4
+[2025-04-10 19:36:43] GPU Information: NVIDIA H100 80GB HBM3
+Running nvidia-smi to check GPU status:
+Thu Apr 10 19:36:43 2025       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 570.124.06             Driver Version: 570.124.06     CUDA Version: 12.8     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100 80GB HBM3          On  |   00000000:19:00.0 Off |                    0 |
+| N/A   38C    P0             74W /  700W |       1MiB /  81559MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+🦥 Unsloth: Will patch your computer to enable 2x faster free finetuning.
+Unsloth: Failed to patch Gemma3ForConditionalGeneration.
+🦥 Unsloth Zoo will now patch everything to make training faster!
+INFO 04-10 19:36:54 [__init__.py:239] Automatically detected platform cuda.
+==((====))==  Unsloth 2025.3.19: Fast Llama patching. Transformers: 4.51.2. vLLM: 0.8.2.
+   \\   /|    NVIDIA H100 80GB HBM3. Num GPUs = 1. Max memory: 79.19 GB. Platform: Linux.
+O^O/ \_/ \    Torch: 2.6.0+cu124. CUDA: 9.0. CUDA Toolkit: 12.4. Triton: 3.2.0
+\        /    Bfloat16 = TRUE. FA [Xformers = 0.0.29.post2. FA2 = False]
+ "-____-"     Free license: http://github.com/unslothai/unsloth
+Unsloth: Fast downloading is enabled - ignore downloading bars which are red colored!
+Unsloth: vLLM loading unsloth/meta-llama-3.1-8b-instruct-unsloth-bnb-4bit with actual GPU utilization = 59.54%
+Unsloth: Your GPU has CUDA compute capability 9.0 with VRAM = 79.19 GB.
+Unsloth: Using conservativeness = 1.0. Chunked prefill tokens = 1024. Num Sequences = 226.
+Unsloth: vLLM's KV Cache can use up to 40.98 GB. Also swap space = 6 GB.
+ERROR 04-10 19:36:58 [config.py:102] Error retrieving file list: (MaxRetryError('HTTPSConnectionPool(host=\'huggingface.co\', port=443): Max retries exceeded with url: /api/models/unsloth/meta-llama-3.1-8b-instruct-unsloth-bnb-4bit/tree/main?recursive=True&expand=False (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x1495bd9b97b0>: Failed to resolve \'huggingface.co\' ([Errno -2] Name or service not known)"))'), '(Request ID: c74cbc52-8415-4116-be55-45c168bbf2ab)'), retrying 1 of 2
+ERROR 04-10 19:37:00 [config.py:100] Error retrieving file list: (MaxRetryError('HTTPSConnectionPool(host=\'huggingface.co\', port=443): Max retries exceeded with url: /api/models/unsloth/meta-llama-3.1-8b-instruct-unsloth-bnb-4bit/tree/main?recursive=True&expand=False (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x1495bd9b9fc0>: Failed to resolve \'huggingface.co\' ([Errno -2] Name or service not known)"))'), '(Request ID: 53fcbce1-ea09-4e3e-88d8-47421e35f2fc)')
+ERROR 04-10 19:37:05 [config.py:102] Error retrieving file list: (MaxRetryError('HTTPSConnectionPool(host=\'huggingface.co\', port=443): Max retries exceeded with url: /api/models/unsloth/meta-llama-3.1-8b-instruct-unsloth-bnb-4bit/tree/main?recursive=True&expand=False (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x1496077e3af0>: Failed to resolve \'huggingface.co\' ([Errno -2] Name or service not known)"))'), '(Request ID: 54cac192-7d5b-481b-ba25-0d30712c3004)'), retrying 1 of 2
+ERROR 04-10 19:37:07 [config.py:100] Error retrieving file list: (MaxRetryError('HTTPSConnectionPool(host=\'huggingface.co\', port=443): Max retries exceeded with url: /api/models/unsloth/meta-llama-3.1-8b-instruct-unsloth-bnb-4bit/tree/main?recursive=True&expand=False (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x1495bdc06f80>: Failed to resolve \'huggingface.co\' ([Errno -2] Name or service not known)"))'), '(Request ID: a2e43940-2e32-4af2-9778-a9b33eac56fa)')
