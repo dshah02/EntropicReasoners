@@ -75,6 +75,7 @@ def extract_strategy_idx(text):
     except ValueError:
         raise ValueError(f"Could not convert '{idx_substring}' to an integer")
     
+    
 
 def replace_strategy_idx(text, new_idx=None):
     original_idx = extract_strategy_idx(text)
