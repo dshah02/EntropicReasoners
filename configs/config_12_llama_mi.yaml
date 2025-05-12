@@ -1,0 +1,8 @@
+max_seq_length: 1024
+lora_rank: 32
+alpha: 3.0
+alpha2: 1.0
+max_z: 5
+steps: 2000
+mi: True
+model: llama

@@ -1,0 +1,8 @@
+max_seq_length: 1024
+lora_rank: 32
+alpha: 1.0
+alpha2: 3.0
+max_z: 5
+steps: 2000
+mi: True
+model: r1-qwen
