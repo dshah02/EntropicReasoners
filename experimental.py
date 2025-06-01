@@ -18,7 +18,7 @@ from UNSLOTH_rewards import (
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--config', type=str, default='config_1.yaml')
+parser.add_argument('--config', type=str, default='configs/config_1.yaml')
 parser.add_argument('--model', type=str, default = "", required=False)
 
 args = parser.parse_args()
