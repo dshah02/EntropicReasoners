@@ -13,18 +13,18 @@ parser.add_argument('--model', type=str, default = "llama", required=False)
 args = parser.parse_args()
 model_name = args.model
 
-if "gemma" in model_name:
-    model_name = "google/gemma-3-4b-it"
-    cache_dir = "../../../scratch/gpfs/ds6237/cache/gemma-4b"
-elif "qwen" in model_name:
+# if "gemma" in model_name:
+#     model_name = "google/gemma-3-4b-it"
+#     cache_dir = f"/scratch/gpfs/{os.environ['USER']}/cache/gemma-4b"
+if "qwen" in model_name:
     model_name = "Qwen/Qwen2.5-7B-Instruct"
-    cache_dir = "../../../scratch/gpfs/ds6237/cache/qwen-2-5-7b"
+    cache_dir = f"/scratch/gpfs/{os.environ['USER']}/cache/qwen-2-5-7b"
 elif "r1" in model_name:
     model_name = "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B"
-    cache_dir = "../../../scratch/gpfs/ds6237/cache/r1-qwen"
+    cache_dir = f"/scratch/gpfs/{os.environ['USER']}/cache/r1-qwen"
 else:
     model_name = "meta-llama/meta-Llama-3.1-8B-Instruct"
-    cache_dir = "../../../scratch/gpfs/ds6237/cache/llama-3-1-8b"
+    cache_dir = f"/scratch/gpfs/{os.environ['USER']}/cache/llama-3-1-8b"
 
 max_seq_length = 1024 
 lora_rank = 32      

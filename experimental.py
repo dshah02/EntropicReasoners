@@ -38,7 +38,7 @@ Z = list(range(1, config['max_z'] + 1))
 steps = config.get('steps', 250)
 model_name = args.model if args.model != None else config.get('model', 'llama')
 print("MODEL NAME:", model_name)
-store_dir = "../../../scratch/gpfs/ds6237"
+store_dir = f"/scratch/gpfs/{os.environ['USER']}"
 
 if "gemma" == model_name: #unsupported by unsloth for now
     model_name = "google/gemma-3-4b-it"

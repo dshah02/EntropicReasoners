@@ -78,7 +78,7 @@ def load_dataset(dataset_path, num_problems=-1):
 #all this gets run
 output_path = './outputs/data.json'
 dataset_path = './data/GSM8K/test.json'
-model_path = "/scratch/gpfs/ds6237/models/outputs_6742_5_5.0_Qwen/Qwen2.5-7B/checkpoint-2000"
+model_path = f"/scratch/gpfs/{os.environ['USER']}/models/outputs_6742_5_5.0_Qwen/Qwen2.5-7B/checkpoint-2000"
 configs = {'num_problems': 100,
            'max_strategy': 5,
            'model_path': model_path,

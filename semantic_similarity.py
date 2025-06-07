@@ -8,7 +8,7 @@ from npeet import entropy_estimators as ee
 
 _CACHED_MODEL = None #is this how you do it?
 
-def get_cached_model(model_name: str = '/scratch/gpfs/oy3975/cache/Linq-Embed-Mistral') -> SentenceTransformer:
+def get_cached_model(model_name: str = f"/scratch/gpfs/{os.environ['USER']}/cache/multilingual") -> SentenceTransformer:
     #Avoids repeatedly redownloading
     global _CACHED_MODEL
     if _CACHED_MODEL is None:
@@ -17,7 +17,7 @@ def get_cached_model(model_name: str = '/scratch/gpfs/oy3975/cache/Linq-Embed-Mi
 
 def compute_embedding_label_mi(texts: List[str], 
                              labels: List[int], 
-                             model_name: str = '/scratch/gpfs/oy3975/cache/multilingual',
+                             model_name: str = f"/scratch/gpfs/{os.environ['USER']}/cache/multilingual",
                              n_shuffles: int = 10,
                              compute_control: bool = True) -> dict:
     labels = np.array(labels)

@@ -17,7 +17,7 @@ parser.add_argument('--model', type=str, default = "llama", required=False, help
 args = parser.parse_args()
 model_name = args.model
 
-store_dir = "../../../scratch/gpfs/ds6237"
+store_dir = f"/scratch/gpfs/{os.environ['USER']}"
 
 if "gemma" == model_name: #unsupported by unsloth for now
     model_name = "google/gemma-3-4b-it"
