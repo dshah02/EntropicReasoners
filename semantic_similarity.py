@@ -5,7 +5,6 @@ import torch
 import os
 from pathlib import Path
 from npeet import entropy_estimators as ee
-from sklearn.decomposition import PCA
 
 _CACHED_MODEL = None #is this how you do it?
 

@@ -1,4 +1,4 @@
-name: grpo
+name: grpo_test
 channels:
   - conda-forge
   - defaults
