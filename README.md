@@ -18,5 +18,3 @@ NPEET must be downloaded manually from [the NPEET GitHub](https://github.com/gre
 As Della does not provide Internet access during Slurm jobs, you must then download the weights for the models you wish to use. We have provided several examples which can be downloaded using the ```cache_for_offline.py``` file. Alternatively, they can also be individually downloaded manually through the HuggingFace CLI.
 
 For the semantic MI reward, we require a separate semantic embedding to be downloaded. We have used the [multilingual-e5-large-instruct](https://huggingface.co/intfloat/multilingual-e5-large-instruct) model in our own experiments, but this is interchangeable with any other semantic embedding model. After downloading models, make sure that the variables for model filenames point to the correct places.
-
-# TODO: change username to environment variable as to make saving to your own user directory a lot easier.
