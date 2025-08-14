@@ -1,6 +1,6 @@
 ## Installation
 
-USE PYTHON 3.11 OTHERWISE YOU MAY BE UNABLE TO GET ALL PACKAGES.
+Use Python 3.11 for full compatability.
 
 If you wish to install from a new Python environment, you can install the latest versions of the following packages; the following order listed resulted in the least issues with installation:
 
