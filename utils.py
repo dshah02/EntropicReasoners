@@ -75,7 +75,17 @@ def extract_strategy_idx(text):
     except ValueError:
         raise ValueError(f"Could not convert '{idx_substring}' to an integer")
     
-    
+def add_strategy_string(text, idx):
+    """Prepends 'Strategy {idx} | ' to the given text."""
+    return f"Strategy {idx} | {text}"
+
+def remove_strategy_string(text):
+    """Removes the 'Strategy {idx} | ' prefix from the given text, if present."""
+    strategy_pos = text.find("Strategy ")
+    separator_pos = text.find(" | ")
+    if strategy_pos == 0 and separator_pos != -1:
+        return text[separator_pos + len(" | "):]
+    return text
 
 def replace_strategy_idx(text, new_idx=None):
     original_idx = extract_strategy_idx(text)
