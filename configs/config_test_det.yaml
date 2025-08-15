@@ -5,4 +5,6 @@ alpha2: 0.05
 max_z: 5
 steps: 1
 mi: False
+det: True
+smi: False
 model: qwen

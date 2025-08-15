@@ -13,9 +13,8 @@ from google import genai
 from semantic_determinant import get_embeddings_by_question, analyze_embedding_determinants
 from semantic_similarity import compute_embedding_label_mi
 from UNSLOTH_rewards import (
-                            SYSTEM_PROMPT, extract_hash_answer, xmlcount_reward_func, 
+                            xmlcount_reward_func, 
                              soft_format_reward_func, strict_format_reward_func, 
-                             int_reward_func, correctness_reward_func,
                              math_correctness_func
                              )
 from utils import load_model
@@ -291,9 +290,9 @@ training_args = GRPOConfig(
     lr_scheduler_type="cosine",
     optim="paged_adamw_8bit",
     logging_steps=1,
-    per_device_train_batch_size=1,
-    gradient_accumulation_steps=2,
-    num_generations=2,
+    per_device_train_batch_size=6,
+    gradient_accumulation_steps=1,
+    num_generations=6,
     max_prompt_length=max_prompt_length,
     max_completion_length=max_seq_length - max_prompt_length,
     max_steps=steps,
