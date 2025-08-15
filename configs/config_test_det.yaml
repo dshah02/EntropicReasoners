@@ -3,6 +3,6 @@ lora_rank: 32
 alpha: 5.0
 alpha2: 0.05
 max_z: 5
-steps: 5
+steps: 1
 mi: False
 model: qwen

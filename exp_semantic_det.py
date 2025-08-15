@@ -14,7 +14,8 @@ from semantic_determinant import get_embeddings_by_question, analyze_embedding_d
 from UNSLOTH_rewards import (
                             SYSTEM_PROMPT, extract_hash_answer, xmlcount_reward_func, 
                              soft_format_reward_func, strict_format_reward_func, 
-                             int_reward_func, correctness_reward_func
+                             int_reward_func, correctness_reward_func,
+                             math_correctness_func
                              )
 from utils import load_model
 from utils import extract_strategy_idx, replace_strategy_idx, add_strategy_string, remove_strategy_string
@@ -28,8 +29,13 @@ client = genai.Client(api_key=GEMINI_API_KEY)
 parser = argparse.ArgumentParser()
 parser.add_argument('--config', type=str, default='config_1.yaml')
 parser.add_argument('--model', type=str, default = "llama", required=False)
+parser.add_argument('--dataset', type=str, default = "gsm8k", required=False)
 
 args = parser.parse_args()
+
+dataset = args.dataset.lower()
+if dataset not in ["gsm8k", "math"]:
+    raise ValueError("Dataset must be either 'gsm8k' or 'math'")
 
 #required for offline
 os.environ["TRANSFORMERS_OFFLINE"] = "1"
@@ -43,6 +49,8 @@ print(config['max_seq_length'])
 print("lora_rank", config['lora_rank'])
 print("alpha", config['alpha'])
 print("alpha2", config['alpha2'])
+print("individual_reward_factor", config.get('individual_reward_factor', 1))
+print("pass_reward_factor", config.get('pass_reward_factor', 0))
 print("max_z", config['max_z'])
 print("steps", config.get('steps', 250))
 print("mi", config.get('mi', True))
@@ -54,6 +62,8 @@ max_seq_length = config['max_seq_length']
 lora_rank = config['lora_rank']
 alpha = config['alpha']
 alpha2 = config.get('alpha2', alpha)
+individual_reward_factor = config.get('individual_reward_factor', 1)
+pass_reward_factor = config.get('pass_reward_factor', 0)
 Z = list(range(1, config['max_z'] + 1))
 steps = config.get('steps', 250)
 use_mi = config.get('mi', True)
@@ -77,8 +87,12 @@ else:
 
 model, tokenizer = load_model(cache_dir, max_seq_length, lora_rank, peft_apply=True)
 
+if dataset == "gsm8k":
+    filepath = "./dataset_cache/gsm8k_train.json"
+else:
+    filepath = "./dataset_cache/math_train.json"
 
-with open("./dataset_cache/gsm8k_train.json", "r") as f:
+with open(filepath, "r") as f:
     dataset_data = json.load(f)
 
 if shuffle_dataset:
@@ -90,9 +104,6 @@ for item in dataset_data:
     item['prompt'][1]['content'] = add_strategy_string(item['prompt'][1]['content'], idx)
    
 dataset = Dataset.from_list(dataset_data)
-
- 
-
 
 def get_log_probability(prompt, completion):
     prompt_tokens = tokenizer.encode(prompt, add_special_tokens=False)
@@ -157,37 +168,59 @@ def mi_reward(completions, prompts, answer, **kwargs):
 def semantic_det_reward(completions, prompts, **kwargs):
     contents = [completion[0]['content'] for completion in completions]
     questions = [prompt[1]['content'] for prompt in prompts]
-    
 
-    # Group by base prompt (without strategy string)
-    base_prompts = [remove_strategy_string(q) for q in questions]
-    groups = {}
-    for idx, base in enumerate(base_prompts):
-        groups.setdefault(base, []).append(idx)
+    # Group questions by incrementing the index, cut off when a question repeats
+    groups = []
+    current_group = []
+    seen_questions = set()
+    for i, q in enumerate(questions):
+        if q in seen_questions:
+            if current_group:
+                groups.append(current_group)
+            current_group = []
+            seen_questions = set()
+        current_group.append(contents[i])
+        seen_questions.add(q)
+    if current_group:
+        groups.append(current_group)
 
-    rewards = [0.0] * len(contents)
-    try:
-        contents_by_question = []
-        group_indices = []
-        for group_idxs in groups.values():
-            group_contents = [contents[i] for i in group_idxs]
-            contents_by_question.append(group_contents)
-            group_indices.append(group_idxs)
-        # Get embeddings for this group (pass only completions)
-        embeddings = get_embeddings_by_question(contents_by_question, client)
-        # Compute negative log determinant
-        _, dets = analyze_embedding_determinants(embeddings)
-        neg_log_dets = [-math.log(det) if det > 0 else float('inf') for det in dets]
-        scaled_rewards = [alpha2 * r for r in neg_log_dets]
-        # Propagate group reward to each member in the group
-        for group_idxs, group_reward in zip(group_indices, scaled_rewards):
-            for idx in group_idxs:
-                rewards[idx] = group_reward
-
-    except Exception as e:
-        print(f"Error in semantic determinant calculation: {e}")
+    rewards = []
+    embeddings = get_embeddings_by_question(groups, client)
+    # embeddings is a list of embedding groups, one per group
+    # analyze_embedding_determinants expects a list of embedding groups
+    _, dets = analyze_embedding_determinants(embeddings)
+    for group, det in zip(groups, dets):
+        neg_log_det = -math.log(det) if det > 0 else float('inf')
+        rewards.extend([alpha2 * neg_log_det] * len(group))
 
     return rewards
+
+def batch_correctness_reward_func(completions, prompts, answer, **kwargs):
+    questions = [prompt[1]['content'] for prompt in prompts]
+    
+    individual_rewards = math_correctness_func(prompts, completions, answer, **kwargs)
+    # Group rewards by the same logic as semantic_det_reward
+    groups = []
+    current_group = []
+    seen_questions = set()
+    for i, q in enumerate(questions):
+        if q in seen_questions:
+            if current_group:
+                groups.append(current_group)
+            current_group = []
+            seen_questions = set()
+        current_group.append(individual_rewards[i])
+        seen_questions.add(q)
+    if current_group:
+        groups.append(current_group)
+
+    rewards = []
+    for group in groups:
+        max_reward = max(group)
+        rewards.extend([max_reward] * len(group))
+    
+    result = [pass_reward_factor * x + individual_reward_factor * y for x, y in zip(rewards, individual_rewards)]
+    return result
 
 class StrategyGroupedGRPOTrainer(GRPOTrainer):
     def _prepare_inputs(self, inputs):
@@ -232,9 +265,8 @@ training_args = GRPOConfig(
     lr_scheduler_type="cosine",
     optim="paged_adamw_8bit",
     logging_steps=1,
-    per_device_train_batch_size=1,
-    gradient_accumulation_steps=1,
-    num_generations=6,
+    per_device_train_batch_size=6,
+    num_generations=2,
     max_prompt_length=max_prompt_length,
     max_completion_length=max_seq_length - max_prompt_length,
     max_steps=steps,
@@ -248,15 +280,17 @@ training_args = GRPOConfig(
 
 print('starting training')
 
+standard_reward_funcs = [
+    xmlcount_reward_func,
+    soft_format_reward_func,
+    strict_format_reward_func,
+    batch_correctness_reward_func,
+]
+
 trainer = StrategyGroupedGRPOTrainer(
     model=model,
     processing_class=tokenizer,
-    reward_funcs=[
-        xmlcount_reward_func,
-        soft_format_reward_func,
-        strict_format_reward_func,
-        int_reward_func,
-        correctness_reward_func,
+    reward_funcs=standard_reward_funcs + [
         *([] if not use_mi else [mi_reward]),  # Conditionally include mi_reward
         semantic_det_reward,
     ],

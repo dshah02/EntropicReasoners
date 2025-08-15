@@ -75,7 +75,7 @@ def get_embeddings_by_question(completions_by_question, client):
 # Assuming 'embeddings_by_question' is available from the previous step,
 # where it's a list of NumPy arrays, each representing the embeddings for a question's completions.
 
-def analyze_embedding_determinants(embeddings_by_question, num_samples=100, sample_size=10):
+def analyze_embedding_determinants(embeddings_by_question, num_samples=100):
     """
     For each question's embeddings, randomly samples subsets and computes Gram matrix determinants.
     Prints and returns metrics for each question.
@@ -87,17 +87,11 @@ def analyze_embedding_determinants(embeddings_by_question, num_samples=100, samp
         question_determinants = []
 
         for _ in range(num_samples):
-            if embeddings_matrix.shape[0] >= sample_size:
-                sampled_indices = np.random.choice(embeddings_matrix.shape[0], sample_size, replace=False)
-                sampled_embeddings = embeddings_matrix[sampled_indices]
-                G = np.dot(sampled_embeddings, sampled_embeddings.T)
-                det_G = np.linalg.det(G)
-                if det_G < 0:
-                    det_G = 0
-                question_determinants.append(det_G)
-            else:
-                print(f"Warning: Not enough embeddings ({embeddings_matrix.shape[0]}) to sample {sample_size} for Question {i+1}. Skipping sampling for this question.")
-                break
+            G = np.dot(embeddings_matrix, embeddings_matrix.T)
+            det_G = np.linalg.det(G)
+            if det_G < 0:
+                det_G = 0
+            question_determinants.append(det_G)
 
         if question_determinants:
             question_max_determinant = np.sqrt(max(question_determinants))
