@@ -11,6 +11,7 @@ import yaml
 import argparse
 from google import genai
 from semantic_determinant import get_embeddings_by_question, analyze_embedding_determinants
+from semantic_similarity import compute_embedding_label_mi
 from UNSLOTH_rewards import (
                             SYSTEM_PROMPT, extract_hash_answer, xmlcount_reward_func, 
                              soft_format_reward_func, strict_format_reward_func, 
@@ -54,8 +55,9 @@ print("pass_reward_factor", config.get('pass_reward_factor', 0))
 print("max_z", config['max_z'])
 print("steps", config.get('steps', 250))
 print("mi", config.get('mi', True))
+print("det", config.get('det', False))
+print("smi", config.get('smi', False))
 print("shuffle", config.get('shuffle', True))
-
 
 cache_dir = "./cache"
 max_seq_length = config['max_seq_length']
@@ -67,6 +69,8 @@ pass_reward_factor = config.get('pass_reward_factor', 0)
 Z = list(range(1, config['max_z'] + 1))
 steps = config.get('steps', 250)
 use_mi = config.get('mi', True)
+use_det = config.get('det', False)
+use_smi = config.get('smi', False)
 shuffle_dataset = config.get('shuffle', True)
 model_name = config.get('model', args.model)
 
@@ -197,6 +201,7 @@ def semantic_det_reward(completions, prompts, **kwargs):
 
 def batch_correctness_reward_func(completions, prompts, answer, **kwargs):
     questions = [prompt[1]['content'] for prompt in prompts]
+    print(f"Questions: {questions}")
     
     individual_rewards = math_correctness_func(prompts, completions, answer, **kwargs)
     # Group rewards by the same logic as semantic_det_reward
@@ -218,9 +223,30 @@ def batch_correctness_reward_func(completions, prompts, answer, **kwargs):
     for group in groups:
         max_reward = max(group)
         rewards.extend([max_reward] * len(group))
+
+    print(f"Batch reward: {rewards}")
+    print(f"Individual reward: {individual_rewards}")
     
     result = [pass_reward_factor * x + individual_reward_factor * y for x, y in zip(rewards, individual_rewards)]
     return result
+
+def semantic_mi_reward(completions, prompts, **kwargs):
+    contents = [completion[0]['content'] for completion in completions]
+    questions = [prompt[1]['content'] for prompt in prompts]
+    
+    try:
+        labels = [extract_strategy_idx(i) for i in questions]
+        print(labels)
+        with torch.no_grad():
+            miest = compute_embedding_label_mi(contents, labels, compute_control=False)
+        
+        # Scale MI estimate similar to mi_reward
+        scaled_mi = alpha2 * miest["total_mi"]  # Access the total_mi value from dict
+    except Exception as e:
+        print(f"Error in semantic MI calculation: {e}")
+        scaled_mi = 0.0
+
+    return [scaled_mi] * len(contents)
 
 class StrategyGroupedGRPOTrainer(GRPOTrainer):
     def _prepare_inputs(self, inputs):
@@ -265,7 +291,8 @@ training_args = GRPOConfig(
     lr_scheduler_type="cosine",
     optim="paged_adamw_8bit",
     logging_steps=1,
-    per_device_train_batch_size=6,
+    per_device_train_batch_size=1,
+    gradient_accumulation_steps=2,
     num_generations=2,
     max_prompt_length=max_prompt_length,
     max_completion_length=max_seq_length - max_prompt_length,
@@ -292,7 +319,8 @@ trainer = StrategyGroupedGRPOTrainer(
     processing_class=tokenizer,
     reward_funcs=standard_reward_funcs + [
         *([] if not use_mi else [mi_reward]),  # Conditionally include mi_reward
-        semantic_det_reward,
+        *([] if not use_det else [semantic_det_reward]),
+        *([] if not use_smi else [semantic_mi_reward]),
     ],
     args=training_args,
     train_dataset=dataset,
