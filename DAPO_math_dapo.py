@@ -194,9 +194,7 @@ def is_correct_minerva(
         Tuple of (is_correct, normalized_prediction)
     """
     # Extract answer from solution
-    match = re.findall(answer_pattern, solution_str)
-    extracted_answer = match[-1] if match else "[INVALID]"
-    pred = normalize_final_answer(extracted_answer)
+    pred = normalize_final_answer(solution_str)
 
     # Process ground truth
     if gt_need_extract:

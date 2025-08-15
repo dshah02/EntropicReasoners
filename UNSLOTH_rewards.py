@@ -1,5 +1,6 @@
 ####TAKEN FROM UNSLOTH NOTEBOOK: https://colab.research.google.com/github/unslothai/notebooks/blob/main/nb/Llama3.1_(8B)-GRPO.ipynb#scrollTo=hnbEBoBcCWOc
 import re
+from DAPO_math_dapo import compute_score
 
 # Load and prep dataset
 SYSTEM_PROMPT = """
@@ -10,6 +11,7 @@ Respond in the following format:
 <answer>
 ...
 </answer>
+Put ONLY the final numerical answer in the <answer> tag.
 """
 
 XML_COT_FORMAT = """\
@@ -75,3 +77,14 @@ def extract_hash_answer(text: str) -> str | None:
     if "####" not in text:
         return None
     return text.split("####")[1].strip()
+
+def math_correctness_func(prompts, completions, answer, **kwargs) -> list[float]:
+    responses = [completion[0]['content'] for completion in completions]
+    q = prompts[0][-1]['content']
+    extracted_responses = [extract_xml_answer(r) for r in responses]
+    # print(f"\nExtracted:\n{extracted_responses}")
+    # print(f"\nAnswer:\n{answer}")
+    # print('-'*20, f"Question:\n{q}", f"\nAnswer:\n{answer[0]}", f"\nExtracted:\n{extracted_responses[0]}")
+    scores = [1 + compute_score(r, a)["score"] for r, a in zip(extracted_responses, answer)]
+    # print(f"Scores: {scores}")
+    return scores
