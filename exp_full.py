@@ -75,13 +75,13 @@ if "gemma" == model_name: #unsupported by unsloth for now
     model_name = "google/gemma-3-4b-it"
     cache_dir = f"{store_dir}/cache/gemma-4b"
 elif "qwen" == model_name:
-    model_name = "Qwen/Qwen2.5-7B"
+    model_name = "Qwen2.5-7B"
     cache_dir = f"{store_dir}/cache/qwen-2-5-7b"
 elif "r1-qwen" == model_name:
-    model_name = "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B" #works but says 5b
+    model_name = "DeepSeek-R1-Distill-Qwen-1.5B" #works but says 5b
     cache_dir =  f"{store_dir}/cache/r1-qwen"
 else:
-    model_name = "meta-llama/meta-Llama-3.1-8B-Instruct"
+    model_name = "meta-Llama-3.1-8B-Instruct"
     cache_dir =  f"{store_dir}/cache/llama-3-1-8b"
 
 model, tokenizer = load_model(cache_dir, max_seq_length, lora_rank, peft_apply=True)
@@ -273,7 +273,7 @@ max_prompt_length = 256
 
 random.seed() 
 run_id = random.randint(1000, 9999)
-output_dir = f"{model_name}_{config['max_z']}_{alpha_mi}_{alpha_det}_{alpha_smi}_{individual_reward_factor}_{pass_reward_factor}_{run_id}"
+output_dir = f"{model_name}/{dataset}/{config['max_z']}_{alpha_mi}_{alpha_det}_{alpha_smi}_{individual_reward_factor}_{pass_reward_factor}_{run_id}"
 
 training_args = GRPOConfig(
     learning_rate=5e-6,
