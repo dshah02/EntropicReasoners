@@ -7,4 +7,5 @@ individual_reward_factor: 1
 pass_reward_factor: 1
 max_z: 5
 steps: 1
-model: qwen
+model: llama
+dataset: math

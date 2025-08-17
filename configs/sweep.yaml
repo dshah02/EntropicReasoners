@@ -8,3 +8,4 @@ pass_reward_factor: [0, 0.5, 1]
 max_z: 5
 steps: 2000
 model: ["llama", "qwen", "r1-qwen"]
+dataset: ["gsm8k", "math"]

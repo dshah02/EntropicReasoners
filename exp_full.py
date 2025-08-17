@@ -29,13 +29,8 @@ client = genai.Client(api_key=GEMINI_API_KEY)
 parser = argparse.ArgumentParser()
 parser.add_argument('--config', type=str, default='config_1.yaml')
 parser.add_argument('--model', type=str, default = "llama", required=False)
-parser.add_argument('--dataset', type=str, default = "gsm8k", required=False)
 
 args = parser.parse_args()
-
-dataset = args.dataset.lower()
-if dataset not in ["gsm8k", "math"]:
-    raise ValueError("Dataset must be either 'gsm8k' or 'math'")
 
 #required for offline
 os.environ["TRANSFORMERS_OFFLINE"] = "1"
@@ -54,6 +49,7 @@ print("individual_reward_factor", config.get('individual_reward_factor', 1))
 print("pass_reward_factor", config.get('pass_reward_factor', 0))
 print("max_z", config['max_z'])
 print("steps", config.get('steps', 250))
+print("dataset", config.get('dataset', "gsm8k"))
 
 alpha_mi = config.get('alpha_mi', 0)
 alpha_det = config.get('alpha_det', 0)
@@ -69,6 +65,9 @@ pass_reward_factor = config.get('pass_reward_factor', 0)
 Z = list(range(1, config['max_z'] + 1))
 steps = config.get('steps', 250)
 model_name = config.get('model', args.model)
+dataset = config.get('dataset', "gsm8k")
+if dataset not in ["gsm8k", "math"]:
+    raise ValueError("Dataset must be either 'gsm8k' or 'math'")
 
 store_dir = f"/scratch/gpfs/{os.environ['USER']}"
 

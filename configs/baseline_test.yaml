@@ -8,3 +8,4 @@ pass_reward_factor: 0
 max_z: 5
 steps: 1
 model: r1-qwen
+dataset: gsm8k
