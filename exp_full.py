@@ -47,30 +47,27 @@ with open(args.config, 'r') as f:
 
 print(config['max_seq_length'])
 print("lora_rank", config['lora_rank'])
-print("alpha", config['alpha'])
-print("alpha2", config['alpha2'])
+print("alpha_mi", config.get('alpha_mi', 0))
+print("alpha_det", config.get('alpha_det', 0))
+print("alpha_smi", config.get('alpha_smi', 0))
 print("individual_reward_factor", config.get('individual_reward_factor', 1))
 print("pass_reward_factor", config.get('pass_reward_factor', 0))
 print("max_z", config['max_z'])
 print("steps", config.get('steps', 250))
-print("mi", config.get('mi', True))
-print("det", config.get('det', False))
-print("smi", config.get('smi', False))
-print("shuffle", config.get('shuffle', True))
 
+alpha_mi = config.get('alpha_mi', 0)
+alpha_det = config.get('alpha_det', 0)
+alpha_smi = config.get('alpha_smi', 0)
+use_mi = alpha_mi != 0
+use_det = alpha_det != 0
+use_smi = alpha_smi != 0
 cache_dir = "./cache"
 max_seq_length = config['max_seq_length']
 lora_rank = config['lora_rank']
-alpha = config['alpha']
-alpha2 = config.get('alpha2', alpha)
 individual_reward_factor = config.get('individual_reward_factor', 1)
 pass_reward_factor = config.get('pass_reward_factor', 0)
 Z = list(range(1, config['max_z'] + 1))
 steps = config.get('steps', 250)
-use_mi = config.get('mi', True)
-use_det = config.get('det', False)
-use_smi = config.get('smi', False)
-shuffle_dataset = config.get('shuffle', True)
 model_name = config.get('model', args.model)
 
 store_dir = f"/scratch/gpfs/{os.environ['USER']}"
@@ -98,9 +95,7 @@ else:
 with open(filepath, "r") as f:
     dataset_data = json.load(f)
 
-if shuffle_dataset:
-    print("shuffled")
-    random.shuffle(dataset_data)
+random.shuffle(dataset_data)
 
 for item in dataset_data:
     idx = random.choice(Z)
@@ -163,7 +158,7 @@ def mi_reward(completions, prompts, answer, **kwargs):
         M = max(log_values) #to avoid underflow
         log_p = M + math.log(sum(math.exp(lv - M) for lv in log_values))
         
-        reward = alpha * (log_p_z - log_p) 
+        reward = alpha_mi * (log_p_z - log_p) 
         rewards.append(reward)
 
     return rewards
@@ -194,13 +189,13 @@ def semantic_det_reward(completions, prompts, **kwargs):
     _, dets = analyze_embedding_determinants(embeddings)
     for group, det in zip(groups, dets):
         neg_log_det = -math.log(det) if det > 0 else float('inf')
-        rewards.extend([alpha2 * neg_log_det] * len(group))
+        rewards.extend([alpha_det * neg_log_det] * len(group))
 
     return rewards
 
 def batch_correctness_reward_func(completions, prompts, answer, **kwargs):
     questions = [prompt[1]['content'] for prompt in prompts]
-    print(f"Questions: {questions}")
+    # print(f"Questions: {questions}")
     
     individual_rewards = math_correctness_func(prompts, completions, answer, **kwargs)
     # Group rewards by the same logic as semantic_det_reward
@@ -223,8 +218,8 @@ def batch_correctness_reward_func(completions, prompts, answer, **kwargs):
         max_reward = max(group)
         rewards.extend([max_reward] * len(group))
 
-    print(f"Batch reward: {rewards}")
-    print(f"Individual reward: {individual_rewards}")
+    # print(f"Batch reward: {rewards}")
+    # print(f"Individual reward: {individual_rewards}")
     
     result = [pass_reward_factor * x + individual_reward_factor * y for x, y in zip(rewards, individual_rewards)]
     return result
@@ -240,7 +235,7 @@ def semantic_mi_reward(completions, prompts, **kwargs):
             miest = compute_embedding_label_mi(contents, labels, compute_control=False)
         
         # Scale MI estimate similar to mi_reward
-        scaled_mi = alpha2 * miest["total_mi"]  # Access the total_mi value from dict
+        scaled_mi = alpha_smi * miest["total_mi"]  # Access the total_mi value from dict
     except Exception as e:
         print(f"Error in semantic MI calculation: {e}")
         scaled_mi = 0.0
@@ -279,7 +274,7 @@ max_prompt_length = 256
 
 random.seed() 
 run_id = random.randint(1000, 9999)
-output_dir = f"outputs_{run_id}_{config['max_z']}_{config['alpha']}_{model_name}"
+output_dir = f"{model_name}_{config['max_z']}_{alpha_mi}_{alpha_det}_{alpha_smi}_{individual_reward_factor}_{pass_reward_factor}_{run_id}"
 
 training_args = GRPOConfig(
     learning_rate=5e-6,

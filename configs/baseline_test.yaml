@@ -1,0 +1,10 @@
+max_seq_length: 1024
+lora_rank: 32
+alpha_mi: 0
+alpha_det: 0
+alpha_smi: 0
+individual_reward_factor: 1
+pass_reward_factor: 0
+max_z: 5
+steps: 1
+model: r1-qwen
