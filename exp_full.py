@@ -68,6 +68,7 @@ model_name = config.get('model', args.model)
 dataset = config.get('dataset', "gsm8k")
 if dataset not in ["gsm8k", "math"]:
     raise ValueError("Dataset must be either 'gsm8k' or 'math'")
+dataset_text = dataset
 
 store_dir = f"/scratch/gpfs/{os.environ['USER']}"
 
@@ -129,7 +130,8 @@ def get_log_probability(prompt, completion):
     
     completion_log_prob = 0.0
 
-    for i in range(len(prompt_tokens), len(combined_tokens)):
+    output_len = log_probs.shape[1]
+    for i in range(len(prompt_tokens), min(len(combined_tokens), output_len)):
         token_id = combined_tokens[i]
         # print(token_id, tokenizer.decode([token_id]))
         token_log_prob = log_probs[0, i-1, token_id].item()  # -1 cause next token
@@ -273,7 +275,7 @@ max_prompt_length = 256
 
 random.seed() 
 run_id = random.randint(1000, 9999)
-output_dir = f"{model_name}/{dataset}/{config['max_z']}_{alpha_mi}_{alpha_det}_{alpha_smi}_{individual_reward_factor}_{pass_reward_factor}_{run_id}"
+output_dir = f"{model_name}/{dataset_text}/{config['max_z']}_{alpha_mi}_{alpha_det}_{alpha_smi}_{individual_reward_factor}_{pass_reward_factor}_{run_id}"
 
 training_args = GRPOConfig(
     learning_rate=5e-6,
@@ -290,7 +292,7 @@ training_args = GRPOConfig(
     max_prompt_length=max_prompt_length,
     max_completion_length=max_seq_length - max_prompt_length,
     max_steps=steps,
-    save_steps=100,
+    save_steps=steps,
     max_grad_norm=0.1,
     report_to="none",
     output_dir=f"{store_dir}/models/{output_dir}",

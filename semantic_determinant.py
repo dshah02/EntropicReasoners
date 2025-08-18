@@ -110,8 +110,8 @@ def analyze_embedding_determinants(embeddings_by_question, num_samples=100):
                 "question_index": i,
                 "max_determinant": question_max_determinant,
                 "log_max_determinant": np.log(question_max_determinant) if question_max_determinant > 0 else float('-inf'),
-                "average_log_determinant": average_log_determinant,
-                "log_average_determinant": log_average_determinant,
+                "average_log_determinant": average_log_determinant / 2,
+                "log_average_determinant": log_average_determinant / 2,
                 "determinants": question_determinants
             })
         else:
@@ -146,7 +146,7 @@ if __name__ == "__main__":
     embeddings_by_question = get_embeddings_by_question(completions_by_question, client)
 
     # Step 3: Analyze embedding determinants
-    analysis_results, max_determinants = analyze_embedding_determinants(embeddings_by_question, num_samples=10, sample_size=3)
+    analysis_results, max_determinants = analyze_embedding_determinants(embeddings_by_question, num_samples=10)
 
     # Print summary
     for i, result in enumerate(analysis_results):
