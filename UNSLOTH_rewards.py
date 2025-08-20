@@ -11,7 +11,6 @@ Respond in the following format:
 <answer>
 ...
 </answer>
-Put ONLY the final numerical answer in the <answer> tag.
 """
 
 XML_COT_FORMAT = """\
